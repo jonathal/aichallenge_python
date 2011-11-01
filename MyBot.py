@@ -7,6 +7,8 @@ import logging
 turn_number = 0
 bot_version = 'v0.1'
 
+SUBMISSION=False
+
 class LogFilter(logging.Filter):
   """
   This is a filter that injects stuff like TurnNumber into the log
@@ -134,7 +136,12 @@ if __name__ == '__main__':
         psyco.full()
     except ImportError:
         pass
-    logging.basicConfig(filename='bot.log',level=logging.DEBUG,format="%(asctime)s-%(version)s- Turn:%(turn_number)s-%(funcName)25s() - %(message)s")
+    
+    if not SUBMISSION:
+        logging.basicConfig(filename='bot.log',level=logging.DEBUG,format="%(asctime)s-%(version)s- Turn:%(turn_number)s-%(funcName)25s() - %(message)s")
+    else:
+        logging.basicConfig(level=logging.ERROR)
+        
     log_filter  = LogFilter()
     logging.getLogger().addFilter(log_filter)
     try:

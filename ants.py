@@ -233,9 +233,10 @@ class Ants():
         openHeap = []
         
         water_tiles = []
-        for row in  self.map:
+        for x, row in enumerate(self.map):
             for col in row:
-                water_tiles.append((row, col))                
+                if self.map[x][col] == WATER:
+                    water_tiles.append((x, col))
         closedSet = set(water_tiles)
         
         parents = {}
