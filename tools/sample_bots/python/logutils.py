@@ -3,8 +3,8 @@ import logging
 """Initializes Logging infrastructure for the bot"""
 
 def initLogging():
-  #logLevel = logging.DEBUG
-  logLevel = logging.INFO
+  logLevel = logging.DEBUG
+  #logLevel = logging.INFO
   #logLevel = logging.WARNING
   logger = logging.getLogger("ConsoleLog")
   logger.setLevel(logLevel)

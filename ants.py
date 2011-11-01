@@ -5,6 +5,7 @@ import random
 import time
 from collections import defaultdict
 from math import sqrt
+import logging
 
 MY_ANT = 0
 ANTS = 0
@@ -136,6 +137,9 @@ class Ants():
     
     def issue_order(self, order):
         'issue an order by writing the proper ant location and direction'
+        sys.stderr.write(str(order))
+        sys.stderr.flush()
+        #raise Exception
         (row, col), direction = order
         sys.stdout.write('o %s %s %s\n' % (row, col, direction))
         sys.stdout.flush()
@@ -220,6 +224,68 @@ class Ants():
             if col1 - col2 <= width2:
                 d.append('w')
         return d
+
+    def aStar(self, start, dest):
+        #TODO: check if ants already surrounding
+        import heapq
+        
+        openSet = set()
+        openHeap = []
+        
+        water_tiles = []
+        for row in  self.map:
+            for col in row:
+                water_tiles.append((row, col))                
+        closedSet = set(water_tiles)
+        
+        parents = {}
+        parents[start] = None
+        scores = {}
+        scores[start] = 0
+    
+        def retracePath(child):
+            path = [child]
+            while parents[child] is not start:
+                child = parents[child]
+                path.append(child)
+            path.reverse()
+            sys.stderr.write("returning path: " + str(path))
+            return path
+    
+        openSet.add(start)
+        openHeap.append((0, start))
+        while openSet:
+            current_score, current = heapq.heappop(openHeap)           
+            if current == dest:
+                return retracePath(current)
+                
+            openSet.remove(current)
+            closedSet.add(current)
+            
+            neighbours = [self.destination(current, dir) for dir in
+                          ["n", "s", "e", "w"]]
+            for neighbour in neighbours:
+                if neighbour not in closedSet:
+                    if not self.passable(neighbour):
+                        closedSet.add(neighbour)
+                        continue
+                    
+                    neighbour_score = current_score + self.distance(neighbour, dest)
+     
+                    if neighbour not in openSet:
+                        openSet.add(neighbour)
+                        tentative_is_better = True
+                    elif neighbour_score < scores[current]:
+                        tentative_is_better = True
+                    else:
+                        tentative_is_better = False
+                        
+                    if tentative_is_better:
+                        parents[neighbour] = current
+                        scores[neighbour] = neighbour_score
+                        heapq.heappush(openHeap, (neighbour_score, neighbour))
+                        
+        return []
 
     def visible(self, loc):
         ' determine which squares are visible to the given player '
